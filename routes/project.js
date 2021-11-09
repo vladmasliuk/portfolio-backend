@@ -22,10 +22,10 @@ router.post("/", verify, async (req, res) => {
 router.put("/:id", verify, async (req, res) => {
     if(req.user.isAdmin){
         try{
-            const updateProject = await Project.findByIdAndUpdate(req.params.body,{
+            const updateProject = await Project.findByIdAndUpdate(req.params.id,{
                 $set: req.body,
             }, {new: true});
-            res.status(200).json("Project is deleted");
+            res.status(200).json(updateProject);
         }catch(err){
             res.status(500).json(err);
         }
@@ -38,13 +38,33 @@ router.put("/:id", verify, async (req, res) => {
 router.delete("/:id", verify, async (req, res) => {
     if(req.user.isAdmin){
         try{
-            await Project.findByIdAndDelete(req.params.body);
-            res.status(200).json(updateProject);
+            await Project.findByIdAndDelete(req.params.id);
+            res.status(200).json("Project is deleted"); 
         }catch(err){
             res.status(500).json(err);
         }
     } else{
         res.status(403).json("You are not admin")
+    }
+})
+
+// get
+router.get("/:id", async (req, res) => {
+    try{
+        const project = await Project.findById(req.params.id);
+        res.status(200).json(project);
+    }catch(err){
+        res.status(500).json(err);
+    }
+})
+
+// get all
+router.get("/", async (req, res) => {
+    try{
+        const projects = await Project.find();
+        res.status(200).json(projects.reverse());
+    }catch(err){
+        res.status(500).json(err);
     }
 })
 
